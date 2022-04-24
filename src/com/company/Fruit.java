@@ -10,13 +10,23 @@ public class Fruit {
     private ArrayList<Integer> snake_y;
 
     public Fruit() {
-        this.x = (int) Math.floor(Math.random() * Main.column) * Main.cellSize;
-        this.y = (int) Math.floor(Math.random() * Main.row) * Main.cellSize;
+        this.x = (int) (Math.floor(Math.random() * Main.column) * Main.cellSize);
+        this.y = (int) (Math.floor(Math.random() * Main.row) * Main.cellSize);
+        System.out.println(this.x);
+        System.out.println(this.y);
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
     }
 
     public void drawFruit(Graphics g) {
         g.setColor(Color.white);
-        g.drawRect(this.x, this.y, Main.cellSize, Main.cellSize);
+        g.fillRect(this.x, this.y, Main.cellSize, Main.cellSize);
     }
 
     public void setNewLocation(Snake s) {
