@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,21 +21,39 @@ public class Main extends JPanel implements KeyListener {
     public static int column = height / cellSize;
     private Snake snake;
     private Fruit fruit;
-    private String direction = "Right";
-    private boolean allowKeyPress = true;
+    private static String direction;
+    private boolean allowKeyPress;
     private int speed = 100;
+    private Timer t;
+    private int score;
+    private int highest_score;
 
     public Main() {
-        snake = new Snake();
-        fruit = new Fruit();
+        read_highest_score();
+        reset();
         addKeyListener(this);
-        Timer t = new Timer();
+    }
+
+    public void setTimer() {
+        t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 repaint();
             }
         }, 0,speed);
+    }
+
+    public void reset() {
+        if (snake != null) {
+            snake.snakeBody.clear();
+        }
+        allowKeyPress = true;
+        direction = "Right";
+        snake = new Snake();
+        fruit = new Fruit();
+        score = 0;
+        setTimer();
     }
 
     @Override
@@ -41,6 +64,28 @@ public class Main extends JPanel implements KeyListener {
     @Override
     public void paintComponent(Graphics g) {
         // check if the snake bites itself
+        for (int i = 1; i < snake.snakeBody.size(); i++) {
+            if (snake.snakeBody.get(i).x == snake.snakeBody.get(0).x && snake.snakeBody.get(i).y == snake.snakeBody.get(0).y) {
+                allowKeyPress = false;
+                t.cancel();
+                t.purge();
+                int response = JOptionPane.showOptionDialog(this, "Game over! Your score is " + score + ". The highest score was " + highest_score + ". Would you like to start over?", "Game Over", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+                write_a_file(score);
+
+                switch (response) {
+                    case JOptionPane.CLOSED_OPTION:
+                        System.exit(0);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        System.exit(0);
+                        break;
+                    case JOptionPane.YES_OPTION:
+                        reset();
+                        return;
+                }
+            }
+        }
 
         // get a black background
         g.fillRect(0, 0, width, height);
@@ -67,6 +112,7 @@ public class Main extends JPanel implements KeyListener {
             // first we need to draw another fruit
             fruit.setNewLocation(snake);
             fruit.drawFruit(g);
+            score++;
         } else {
             snake.snakeBody.remove(snake.snakeBody.size() - 1);
         }
@@ -76,6 +122,8 @@ public class Main extends JPanel implements KeyListener {
         allowKeyPress = true;
         requestFocusInWindow();
     }
+
+
 
     public static void main(String[] args) {
         JFrame window = new JFrame("Snake Game");
@@ -111,5 +159,42 @@ public class Main extends JPanel implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    public void read_highest_score() {
+        try {
+            File myObj = new File("filename.txt");
+            Scanner myReader = new Scanner(myObj);
+            highest_score = myReader.nextInt();
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            highest_score = 0;
+            // create new file
+            try {
+                File myObj = new File("filename.txt");
+                if (myObj.createNewFile()) {
+                    System.out.println("File created: " + myObj.getName());
+                }
+                FileWriter myWriter = new FileWriter("filename.txt");
+                myWriter.write(0);
+            } catch (IOException err) {
+                System.out.println("An error occurred.");
+                err.printStackTrace();
+            }
+        }
+    }
+
+
+    public void write_a_file(int score) {
+        try {
+            FileWriter myWriter = new FileWriter("filename.txt");
+            if (score > highest_score) {
+                myWriter.write("" + score);
+                highest_score = score;
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

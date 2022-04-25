@@ -1,5 +1,6 @@
 package com.company;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -8,12 +9,12 @@ public class Fruit {
     private int y;
     private ArrayList<Integer> snake_x;
     private ArrayList<Integer> snake_y;
+    private ImageIcon img;
 
     public Fruit() {
+        img = new ImageIcon("fruit.png");
         this.x = (int) (Math.floor(Math.random() * Main.column) * Main.cellSize);
         this.y = (int) (Math.floor(Math.random() * Main.row) * Main.cellSize);
-        System.out.println(this.x);
-        System.out.println(this.y);
     }
 
     public int getX() {
@@ -25,8 +26,7 @@ public class Fruit {
     }
 
     public void drawFruit(Graphics g) {
-        g.setColor(Color.white);
-        g.fillRect(this.x, this.y, Main.cellSize, Main.cellSize);
+        img.paintIcon(null, g, this.x, this.y);
     }
 
     public void setNewLocation(Snake s) {

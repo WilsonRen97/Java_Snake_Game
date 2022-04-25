@@ -14,9 +14,15 @@ public class Snake {
         snakeBody.add(new Node(20, 0));
     }
 
+
     public void drawSnake(Graphics g) {
-        g.setColor(Color.RED);
-        for (Node n : snakeBody) {
+        for (int i = 0; i < snakeBody.size(); i++) {
+            if (i == 0) {
+                g.setColor(Color.GREEN);
+            } else {
+                g.setColor(Color.ORANGE);
+            }
+            Node n = snakeBody.get(i);
             if (n.x >= Main.width) {
                 n.x = 0;
             }
@@ -29,7 +35,7 @@ public class Snake {
             if (n.y < 0) {
                 n.y = Main.height - Main.cellSize;
             }
-            g.drawRect(n.x, n.y, Main.cellSize, Main.cellSize);
+            g.fillOval(n.x, n.y, Main.cellSize, Main.cellSize);
         }
     }
 
